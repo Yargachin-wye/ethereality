@@ -15,11 +15,13 @@ public class Harpoon : MonoBehaviour
     [SerializeField] private float _dashForce = 1;
     [SerializeField] private float _dashTimer = 1;
     private bool timeOut;
+    
     private Rigidbody2D rigidbody;
 
     public Vector3 targetPosition;
     public bool rotating = false;
     public static Harpoon instance;
+    public bool timeOutDash = false;
 
     private void Awake()
     {
@@ -105,11 +107,14 @@ public class Harpoon : MonoBehaviour
     }
     IEnumerator DashTimeOut()
     {
+        timeOutDash = true;
         yield return new WaitForSeconds(_dashTimer);
         _animator.SetBool("isOpen", false);
+        timeOutDash = false;
     }
     IEnumerator TimeOut()
     {
+        timeOut = true;
         yield return new WaitForSeconds(_timeCd);
         timeOut = false;
     }

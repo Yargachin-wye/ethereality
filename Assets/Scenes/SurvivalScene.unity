@@ -2450,6 +2450,7 @@ MonoBehaviour:
   _dashTimer: 0.2
   targetPosition: {x: 0, y: 0, z: 0}
   rotating: 0
+  timeOutDash: 0
 --- !u!58 &1794402783
 CircleCollider2D:
   m_ObjectHideFlags: 0

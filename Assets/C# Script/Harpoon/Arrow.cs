@@ -53,7 +53,6 @@ public class Arrow : MonoBehaviour
         int currentLayer = collision.gameObject.layer;
         if (_layerMaskTargets == (_layerMaskTargets | (1 << currentLayer)) && this.enabled)
         {
-            Debug.Log(collision.gameObject.name);
             Rigidbody2D rbcl = collision.GetComponent<Rigidbody2D>();
             rigidbody2D.velocity *= 0;
             rigidbody2D.simulated = false;

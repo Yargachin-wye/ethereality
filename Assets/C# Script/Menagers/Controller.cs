@@ -35,16 +35,16 @@ public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoi
     
     public void OnUp(Vector3 vector)
     {
-        onColliderButton = false;
-        if (timer == 0)
+        
+        if (timer == 0 && (onColliderButton || isDragging))
         {
             Harpoon.instance.Dash();
-            return;
         }
         else
         {
             Harpoon.instance.ShotToVector(vector);
         }
+        onColliderButton = false;
     }
     public void OnPointerDown(PointerEventData eventData)
     {
@@ -55,6 +55,10 @@ public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoi
     {
         if (timer <= 0 && isDragging)
         {
+            if (Harpoon.instance.timeOutDash)
+            {
+                return;
+            }
             Harpoon.instance.OpenJaw();
             Harpoon.instance.rotating = true;
 
@@ -66,10 +70,10 @@ public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoi
     public void OnPointerUp(PointerEventData eventData)
     {
         Harpoon.instance.rotating = false;
-        isDragging = false;
 
         if (onColliderButton)
         {
+            isDragging = false;
             return;
         }
 
@@ -77,6 +81,7 @@ public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoi
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(touchPosition.x, touchPosition.y, mainCamera.nearClipPlane));
 
         OnUp(worldPosition);
+        isDragging = false;
     }
     IEnumerator Timer()
     {
