@@ -154,6 +154,13 @@ public class Rope : MonoBehaviour
             "; num = " + numSections +
             "; lineR = " + _lineRenderer1.positionCount);
     }
+    public void OffRope()
+    {
+        enabled = false;
+        _lineRenderer1.enabled = false;
+        _lineRenderer2.enabled = false;
+        _lineRenderer3.enabled = false;
+    }
     IEnumerator TimerRender()
     {
         yield return new WaitForSeconds(0.1f);

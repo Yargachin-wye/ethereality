@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Arrow : MonoBehaviour
 {
-    [SerializeField] private Rope _RopeRenderer;
+    [SerializeField] private RopeV2 _RopeRenderer;
     [SerializeField] private GameObject _sectionPrefab;
     [SerializeField] private GameObject _firstSection;
     [SerializeField] private float _timerStop = 0.75f;
@@ -20,12 +20,14 @@ public class Arrow : MonoBehaviour
     private Rigidbody2D rigidbody2D = null;
     private Transform conector = null;
     private HingeJoint2D conectorHingeJoint2D = null;
+    private List<GameObject> sections = new List<GameObject>();
 
     private void Awake()
     {
         rigidbody2D = GetComponent<Rigidbody2D>();
         sectionLength = _sectionPrefab.GetComponent<HingeJoint2D>().anchor.y;
         lastSection = _firstSection;
+        // sections.Add(lastSection);
         conector = null;
         StartCoroutine(TimerDestroy());
     }
@@ -45,7 +47,7 @@ public class Arrow : MonoBehaviour
         newLastSection.GetComponent<HingeJoint2D>().anchor = newLastSection.transform.InverseTransformPoint(new Vector2(lastSection.transform.position.x, lastSection.transform.position.y));
         newLastSection.GetComponent<HingeJoint2D>().connectedBody = lastSection.GetComponent<Rigidbody2D>();
         lastSection = newLastSection;
-
+        sections.Add(lastSection);
         _RopeRenderer.SetCount(transform.childCount);
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -58,7 +60,7 @@ public class Arrow : MonoBehaviour
             rigidbody2D.simulated = false;
             transform.GetChild(1).GetComponent<HingeJoint2D>().connectedBody = rbcl;
             rbcl.velocity *= 0;
-            StartCoroutine(TimerOf(rbcl));
+            StartCoroutine(TimerOff(rbcl));
 
             _RopeRenderer.StopFly();
             transform.parent = collision.transform;
@@ -76,7 +78,7 @@ public class Arrow : MonoBehaviour
             this.enabled = false;
         }
     }
-    IEnumerator TimerOf(Rigidbody2D rbcl)
+    IEnumerator TimerOff(Rigidbody2D rbcl)
     {
         yield return new WaitForSeconds(_timerAddForse);
 
@@ -87,7 +89,13 @@ public class Arrow : MonoBehaviour
         Destroy(conectorHingeJoint2D);
 
         yield return new WaitForSeconds(0.5f);
-        Destroy(gameObject);
+
+        foreach (GameObject section in sections)
+        {
+            Destroy(section);
+        }
+        enabled = false;
+        _RopeRenderer.OffRope();
     }
     IEnumerator TimerDestroy()
     {

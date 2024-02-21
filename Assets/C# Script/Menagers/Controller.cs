@@ -14,7 +14,7 @@ public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoi
     private int timer = 0;
     private bool onColliderButton = false;
     private bool isDragging = false;
-
+    private bool dashed = true;
     public static Controller instance;
 
     private void Awake()
@@ -36,14 +36,16 @@ public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoi
     public void OnUp(Vector3 vector)
     {
         
-        if (timer == 0 && (onColliderButton || isDragging))
+        if (timer == 0 && !dashed)
         {
             Harpoon.instance.Dash();
+            
         }
         else
         {
             Harpoon.instance.ShotToVector(vector);
         }
+        dashed = true;
         onColliderButton = false;
     }
     public void OnPointerDown(PointerEventData eventData)
@@ -55,10 +57,11 @@ public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoi
     {
         if (timer <= 0 && isDragging)
         {
-            if (Harpoon.instance.timeOutDash)
+            if (Harpoon.instance.dashCD)
             {
                 return;
             }
+            dashed = false;
             Harpoon.instance.OpenJaw();
             Harpoon.instance.rotating = true;
 

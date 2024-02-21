@@ -4961,6 +4961,7 @@ GameObject:
   - component: {fileID: 7558392561571881668}
   - component: {fileID: 7558392561571881669}
   - component: {fileID: 8370147068592444227}
+  - component: {fileID: 3960881615875151436}
   m_Layer: 3
   m_Name: pill_1
   m_TagString: Untagged
@@ -5093,3 +5094,16 @@ MonoBehaviour:
   - {fileID: 344124921, guid: 267faea0ed08d4945a29c29c7e7c9920, type: 3}
   _ruinedCapsulePrefab: {fileID: 8290255664100436142, guid: 32fa12907fa22f74f9e5dffa9a07ecde, type: 3}
   _particles: {fileID: 727570886032717700}
+--- !u!114 &3960881615875151436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7558392561571881667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a12f5d15a73add742a7b6bf6b9105280, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rotationSpeed: 1
