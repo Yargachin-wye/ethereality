@@ -14,20 +14,19 @@ public class Arrow : MonoBehaviour
     [SerializeField] private float _addForceSpeed = 200;
     [SerializeField] private float _speed = 2000;
 
-
     private float sectionLength = 0;
     private GameObject lastSection = null;
     private Rigidbody2D rigidbody2D = null;
     private Transform conector = null;
     private HingeJoint2D conectorHingeJoint2D = null;
     private List<GameObject> sections = new List<GameObject>();
+    private bool nondestructive = false;
 
     private void Awake()
     {
         rigidbody2D = GetComponent<Rigidbody2D>();
         sectionLength = _sectionPrefab.GetComponent<HingeJoint2D>().anchor.y;
         lastSection = _firstSection;
-        // sections.Add(lastSection);
         conector = null;
         StartCoroutine(TimerDestroy());
     }
@@ -60,11 +59,19 @@ public class Arrow : MonoBehaviour
             rigidbody2D.simulated = false;
             transform.GetChild(1).GetComponent<HingeJoint2D>().connectedBody = rbcl;
             rbcl.velocity *= 0;
-            StartCoroutine(TimerOff(rbcl));
 
             _RopeRenderer.StopFly();
             transform.parent = collision.transform;
 
+            if (collision.GetComponent<Slider>() == null)
+            {
+                StartCoroutine(TimerOff(rbcl));
+            }
+            else
+            {
+                Harpoon.instance.shot.AddListener(this.Detach);
+                nondestructive = true;
+            }
             conectorHingeJoint2D = conector.gameObject.AddComponent<HingeJoint2D>();
             conectorHingeJoint2D.anchor = conector.InverseTransformPoint(conector.transform.position);
             conectorHingeJoint2D.connectedBody = lastSection.GetComponent<Rigidbody2D>();
@@ -77,6 +84,13 @@ public class Arrow : MonoBehaviour
 
             this.enabled = false;
         }
+    }
+    private void Detach()
+    {
+        nondestructive = false;
+        Destroy(conectorHingeJoint2D);
+        StartCoroutine(TimerDestroy());
+        Harpoon.instance.shot.RemoveListener(this.Detach);
     }
     IEnumerator TimerOff(Rigidbody2D rbcl)
     {
@@ -108,8 +122,12 @@ public class Arrow : MonoBehaviour
 
             this.enabled = false;
         }
-        yield return new WaitForSeconds(1);
-        Destroy(gameObject);
+        yield return new WaitForSeconds(2);
+        if (!nondestructive)
+        {
+            Destroy(gameObject);
+        }
+        
     }
     public void Shot(Transform cn)
     {

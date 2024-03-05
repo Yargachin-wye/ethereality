@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Harpoon : MonoBehaviour
 {
@@ -20,11 +19,13 @@ public class Harpoon : MonoBehaviour
     
     private Rigidbody2D rigidbody;
 
-    public Vector3 targetPosition;
+    public Vector3 targetDirection;
     public bool rotating = false;
     public static Harpoon instance;
     public bool timeOutDash = false;
     public bool dashCD = false;
+
+    public UnityEvent shot;
 
     private void Awake()
     {
@@ -37,6 +38,7 @@ public class Harpoon : MonoBehaviour
         instance = this;
         rigidbody = GetComponent<Rigidbody2D>();
     }
+    
     public void ShotToClosestPart(Vector2 vector)
     {
         if (timeOut || timeOutDash)
@@ -55,6 +57,7 @@ public class Harpoon : MonoBehaviour
     }
     private IEnumerator Shot(Vector3 pos)
     {
+        shot?.Invoke();
         timeOut = true;
 
         Vector3 difference = pos - transform.position;
@@ -82,14 +85,12 @@ public class Harpoon : MonoBehaviour
     {
         if (rotating)
         {
-            Vector3 difference = targetPosition - transform.position;
-            difference.Normalize();
-            float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
+            targetDirection.Normalize();
+            float rotZ = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
             Quaternion targetRotation = Quaternion.Euler(0f, 0f, rotZ - 90);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.fixedDeltaTime);
         }
     }
-
     public void OpenJaw()
     {
         _animator.SetBool("isOpen", true);
@@ -120,9 +121,6 @@ public class Harpoon : MonoBehaviour
             {
                 DashEnd();
                 collision.GetComponent<Rigidbody2D>().AddForce(transform.up.normalized * _dashForce / 2);
-                collision.GetComponent<Capsule>().TakeDamage(0 + 0.01f);
-                collision.GetComponent<Capsule>().TakeDamage(0 + 0.01f);
-                collision.GetComponent<Capsule>().TakeDamage(0 + 0.01f);
                 collision.GetComponent<Capsule>().TakeDamage(0 + 0.01f);
                 
             }

@@ -1,22 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
-using System.Timers;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] private Camera mainCamera;
     [SerializeField] private float _timeCd = 0.1f;
+
+    [SerializeField] private FloatingJoystick _joystick;
+    [SerializeField] private Image _stick;
+    [SerializeField] private Image _mushroom;
+
     private int timer = 0;
     private bool onColliderButton = false;
     private bool isDragging = false;
     private bool dashed = true;
     public static Controller instance;
-
     private void Awake()
     {
         if (instance != null)
@@ -27,19 +28,24 @@ public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoi
         }
         instance = this;
     }
+    private void Start()
+    {
+        Stick(false);
+        Stick(true);
+        Stick(false);
+    }
     public void OnColliderButtonDown()
     {
         onColliderButton = true;
         StartCoroutine(Timer());
     }
-    
     public void OnUp(Vector3 vector)
     {
-        
+
         if (timer == 0 && !dashed)
         {
             Harpoon.instance.Dash();
-            
+
         }
         else
         {
@@ -61,18 +67,17 @@ public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoi
             {
                 return;
             }
+            Stick(true);
             dashed = false;
             Harpoon.instance.OpenJaw();
-            Harpoon.instance.rotating = true;
-
             Vector2 touchPosition = eventData.position;
-            Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(touchPosition.x, touchPosition.y, mainCamera.nearClipPlane));
-            Harpoon.instance.targetPosition = worldPosition;
+            // Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(touchPosition.x, touchPosition.y, mainCamera.nearClipPlane));
+            Harpoon.instance.targetDirection = -1 * _joystick.Direction;
         }
     }
     public void OnPointerUp(PointerEventData eventData)
     {
-        Harpoon.instance.rotating = false;
+        Stick(false);
 
         if (onColliderButton)
         {
@@ -85,6 +90,21 @@ public class Controller : MonoBehaviour, IDragHandler, IPointerDownHandler, IPoi
 
         OnUp(worldPosition);
         isDragging = false;
+    }
+    private void Stick(bool b)
+    {
+        Harpoon.instance.rotating = b;
+        Color c1 = _stick.color, c2 = _mushroom.color;
+        if (b)
+        {
+            _stick.color = new Color(c1.r, c1.g, c1.b, 0.5f);
+            _mushroom.color = new Color(c2.r, c2.g, c2.b, 0.5f);
+        }
+        else
+        {
+            _stick.color = new Color(c1.r, c1.g, c1.b, 0);
+            _mushroom.color = new Color(c2.r, c2.g, c2.b, 0);
+        }
     }
     IEnumerator Timer()
     {
