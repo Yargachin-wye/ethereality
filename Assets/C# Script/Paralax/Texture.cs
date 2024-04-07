@@ -5,9 +5,9 @@ using UnityEngine;
 public class Texture : MonoBehaviour
 {
     [SerializeField]
-    private Vector2 parallaxEffectMultiplier;// ÍÅ ÄÎËÆÍÎ ÁÛÒÜ 0 ÍÅ ÏĞÈ ÊÀÊÈÕ ÎÁÑÒÎßÒÅËÜÑÒÂÀÕ
+    private List<Vector2> parallaxSmove;// ÍÅ ÄÎËÆÍÎ ÁÛÒÜ 0 ÍÅ ÏĞÈ ÊÀÊÈÕ ÎÁÑÒÎßÒÅËÜÑÒÂÀÕ
 
-    public Material material;
+    public List<Material> materials;
 
     private Transform cameraTransform;
 
@@ -16,12 +16,14 @@ public class Texture : MonoBehaviour
     private void Start()
     {
         cameraTransform = transform.root;
-        //material = GetComponent<Renderer>().sharedMaterial;
     }
     private void LateUpdate()
     {
-        offset = new Vector2(cameraTransform.position.x / 100f / parallaxEffectMultiplier.x, cameraTransform.position.y / 100f / parallaxEffectMultiplier.y);
+        for ( int i = 0; i < parallaxSmove.Count; i++)
+        {
+            offset = new Vector2(cameraTransform.position.x / 100f / parallaxSmove[i].x, cameraTransform.position.y / 100f / parallaxSmove[i].y);
 
-        material.mainTextureOffset = offset;
+            materials[i].mainTextureOffset = offset;
+        }
     }
 }

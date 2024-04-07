@@ -6,6 +6,7 @@ using UnityEngine.Events;
 public class Harpoon : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
+    [SerializeField] private List<Animator> _animatorsEyes;
     [SerializeField] private GameObject _arrowPrefab;
     [SerializeField] private Transform _arrowPosition;
     [SerializeField] private LayerMask _layerMaskTargets;
@@ -29,7 +30,7 @@ public class Harpoon : MonoBehaviour
 
     private void Awake()
     {
-        _animator.SetBool("isOpen", false);
+        _animator.SetBool("mouthIsOpen", false);
         if (instance != null)
         {
             Debug.LogError("Harpoon.instance != null");
@@ -93,7 +94,11 @@ public class Harpoon : MonoBehaviour
     }
     public void OpenJaw()
     {
-        _animator.SetBool("isOpen", true);
+        _animator.SetBool("mouthIsOpen", true);
+        foreach (var anim in _animatorsEyes)
+        {
+            anim.SetBool("mouthIsOpen", true);
+        }
         rigidbody.velocity = Vector2.zero;
     }
     public void Dash()
@@ -141,7 +146,11 @@ public class Harpoon : MonoBehaviour
     }
     private void DashEnd()
     {
-        _animator.SetBool("isOpen", false);
+        _animator.SetBool("mouthIsOpen", false);
+        foreach(var anim in _animatorsEyes)
+        {
+            anim.SetBool("mouthIsOpen", false);
+        }
         timeOutDash = false;
     }
     IEnumerator TimeOut()
