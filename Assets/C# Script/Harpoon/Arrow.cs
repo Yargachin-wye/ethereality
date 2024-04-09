@@ -10,13 +10,14 @@ public class Arrow : MonoBehaviour
     [SerializeField] private float _timerStop = 0.75f;
     [SerializeField] private float _timerAddForse = 0.2f;
     [SerializeField] private LayerMask _layerMaskTargets;
+    [SerializeField] private int _shotDMG = 2;
 
     [SerializeField] private float _addForceSpeed = 200;
     [SerializeField] private float _speed = 2000;
 
     private float sectionLength = 0;
     private GameObject lastSection = null;
-    private Rigidbody2D rigidbody2D = null;
+    private Rigidbody2D rbody2D = null;
     private Transform conector = null;
     private HingeJoint2D conectorHingeJoint2D = null;
     private List<GameObject> sections = new List<GameObject>();
@@ -24,7 +25,7 @@ public class Arrow : MonoBehaviour
 
     private void Awake()
     {
-        rigidbody2D = GetComponent<Rigidbody2D>();
+        rbody2D = GetComponent<Rigidbody2D>();
         sectionLength = _sectionPrefab.GetComponent<HingeJoint2D>().anchor.y;
         lastSection = _firstSection;
         conector = null;
@@ -37,7 +38,7 @@ public class Arrow : MonoBehaviour
 
         if (Vector2.Distance(conector.position, lastSection.transform.position) >= sectionLength)
             AddNewSection();
-        rigidbody2D.velocity = transform.up * _speed * Time.fixedDeltaTime;
+        rbody2D.velocity = transform.up * _speed * Time.fixedDeltaTime;
     }
     private void AddNewSection()
     {
@@ -54,9 +55,14 @@ public class Arrow : MonoBehaviour
         int currentLayer = collision.gameObject.layer;
         if (_layerMaskTargets == (_layerMaskTargets | (1 << currentLayer)) && this.enabled)
         {
+            if (collision.GetComponent<BeeMoving>() != null)
+            {
+                collision.GetComponent<Capsule>().Dead();
+                return;
+            }
             Rigidbody2D rbcl = collision.GetComponent<Rigidbody2D>();
-            rigidbody2D.velocity *= 0;
-            rigidbody2D.simulated = false;
+            rbody2D.velocity *= 0;
+            rbody2D.simulated = false;
             transform.GetChild(1).GetComponent<HingeJoint2D>().connectedBody = rbcl;
             rbcl.velocity *= 0;
 
@@ -76,10 +82,10 @@ public class Arrow : MonoBehaviour
             conectorHingeJoint2D.anchor = conector.InverseTransformPoint(conector.transform.position);
             conectorHingeJoint2D.connectedBody = lastSection.GetComponent<Rigidbody2D>();
             conectorHingeJoint2D.autoConfigureConnectedAnchor = false;
-
+            
             if (collision.GetComponent<Capsule>() != null)
             {
-                collision.GetComponent<Capsule>().TakeDamage(_timerAddForse + 0.01f);
+                collision.GetComponent<Capsule>().TakeDamage(_timerAddForse + 0.01f, _shotDMG);
             }
 
             this.enabled = false;
@@ -116,7 +122,7 @@ public class Arrow : MonoBehaviour
         yield return new WaitForSeconds(_timerStop);
         if (this.enabled)
         {
-            rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
+            rbody2D.bodyType = RigidbodyType2D.Dynamic;
             //lastSection.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePosition;
             _RopeRenderer.StopFly();
 

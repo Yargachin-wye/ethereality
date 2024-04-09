@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -33,6 +34,10 @@ public class BeeMoving : MonoBehaviour
 
         rb2d.MoveRotation(Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
         rb2d.velocity = transform.up * speed;
+    }
+    public void Dead()
+    {
+        gameObject.SetActive(false);
     }
     IEnumerator Timer()
     {

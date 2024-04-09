@@ -16,15 +16,19 @@ public class Harpoon : MonoBehaviour
     [SerializeField] private float _dashForce = 1;
     [SerializeField] private float _dashTimer = 1;
     [SerializeField] private float _dashCD = 1;
+    
+    [SerializeField] private int _dashDMG = 2;
     private bool timeOut;
     
-    private Rigidbody2D rigidbody;
+    private Rigidbody2D rb2d;
 
     public Vector3 targetDirection;
     public bool rotating = false;
     public static Harpoon instance;
     public bool timeOutDash = false;
     public bool dashCD = false;
+
+    public bool hangUp = false;
 
     public UnityEvent shot;
 
@@ -37,7 +41,7 @@ public class Harpoon : MonoBehaviour
             return;
         }
         instance = this;
-        rigidbody = GetComponent<Rigidbody2D>();
+        rb2d = GetComponent<Rigidbody2D>();
     }
     
     public void ShotToClosestPart(Vector2 vector)
@@ -84,6 +88,10 @@ public class Harpoon : MonoBehaviour
     }
     void FixedUpdate()
     {
+        if (hangUp)
+        {
+            rb2d.velocity = Vector2.zero;
+        }
         if (rotating)
         {
             targetDirection.Normalize();
@@ -99,7 +107,8 @@ public class Harpoon : MonoBehaviour
         {
             anim.SetBool("mouthIsOpen", true);
         }
-        rigidbody.velocity = Vector2.zero;
+        hangUp = true;
+        
     }
     public void Dash()
     {
@@ -126,16 +135,22 @@ public class Harpoon : MonoBehaviour
             {
                 DashEnd();
                 collision.GetComponent<Rigidbody2D>().AddForce(transform.up.normalized * _dashForce / 2);
-                collision.GetComponent<Capsule>().TakeDamage(0 + 0.01f);
+                collision.GetComponent<Capsule>().TakeDamage(0.02f, _dashDMG);
                 
+            }
+            if (collision.GetComponent<BeeMoving>() != null)
+            {
+                collision.GetComponent<BeeMoving>().Dead();
+                Dash();
             }
         }
     }
     IEnumerator DashTimeOut()
     {
+        hangUp = false;
         timeOutDash = true;
         dashCD = true;
-        rigidbody.AddForce(transform.up.normalized * _dashForce);
+        rb2d.AddForce(transform.up.normalized * _dashForce);
         yield return new WaitForSeconds(_dashTimer);
         if (timeOutDash)
         {

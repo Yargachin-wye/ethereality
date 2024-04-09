@@ -10,9 +10,34 @@ public class RuinedCapsule : MonoBehaviour
     Color parentColor;
 
     GameObject[] parts;
-    private void Awake()
+    Vector3[] partsPos;
+    Quaternion[] partsRot;
+    private void Start()
     {
-        parts = new GameObject[transform.childCount];
+        
+    }
+    private void OnEnable()
+    {
+        if(parts == null)
+        {
+            parts = new GameObject[transform.childCount];
+            partsPos = new Vector3[transform.childCount];
+            partsRot = new Quaternion[transform.childCount];
+            for (int i = 0; i < parts.Length; i++)
+            {
+                parts[i] = transform.GetChild(i).gameObject;
+                partsPos[i] = parts[i].transform.localPosition;
+                partsRot[i] = parts[i].transform.rotation;
+            }
+        }
+
+        for (int i = 0; i < parts.Length; i++)
+        {
+            parts[i].transform.localPosition = partsPos[i];
+            parts[i].transform.rotation = partsRot[i];
+        }
+
+        
         parentColor = Color.white;
     }
 
@@ -20,7 +45,6 @@ public class RuinedCapsule : MonoBehaviour
     {
         for(int i =0; i < parts.Length; i++)
         {
-            parts[i] = transform.GetChild(i).gameObject;
             parts[i].GetComponent<SpriteRenderer>().color = color;
             int power = Random.Range(_powerRangeMin, _powerRangeMax);
             parts[i].GetComponent<Rigidbody2D>().AddForce((transform.GetChild(i).position - transform.position).normalized * power);
@@ -39,7 +63,7 @@ public class RuinedCapsule : MonoBehaviour
 
         if (parentColor.a <= 0)
         {
-            Destroy(this.gameObject);
+            gameObject.SetActive(false);
             return;
         }
     }

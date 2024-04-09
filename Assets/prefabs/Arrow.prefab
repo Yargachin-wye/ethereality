@@ -175,6 +175,7 @@ MonoBehaviour:
   _layerMaskTargets:
     serializedVersion: 2
     m_Bits: 8
+  _shotDMG: 1
   _addForceSpeed: 4000
   _speed: 2000
 --- !u!50 &8720514003807377899
