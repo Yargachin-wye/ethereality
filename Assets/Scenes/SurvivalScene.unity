@@ -366,13 +366,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 77232871}
+  - component: {fileID: 77232872}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &77232871
 Transform:
   m_ObjectHideFlags: 0
@@ -388,6 +389,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 518883534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &77232872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 77232870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a128979a38c1a3746b2fdffd537f9bc3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainCamera: {fileID: 519420031}
+  _timeCd: 0.1
+  _joystick: {fileID: 1826041908}
+  _stick: {fileID: 1152700719}
+  _mushroom: {fileID: 1866531254}
 --- !u!1 &89517490
 GameObject:
   m_ObjectHideFlags: 0
@@ -1024,7 +1042,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 223
+    m_Bits: 255
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -1403,10 +1421,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8170153791668043269, guid: 0d230cc8be529a542a08cb878ab14b18, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1826041911}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0d230cc8be529a542a08cb878ab14b18, type: 3}
 --- !u!1 &821423204
 GameObject:
@@ -2884,6 +2899,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d2335296c19314419ccb54b7bc53ab9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugColor: {r: 0.17368424, g: 1, b: 0, a: 1}
+  WorldSize: {x: 1500, y: 1500}
+  WorldCenter: {x: 0, y: 0}
+  pointsSize: 1
+  pointsConteiner: {fileID: 1784896362}
+  numberOfPoints: 20000
+  averageLerp: 1
+  PositionPerlinOffset1: {x: 10000, y: 0}
+  PositionPerlinOffset2: {x: 0, y: 500}
+  scale: 100
+  pointPrefab: {fileID: 6683879282547632186, guid: c31a01afcbe2c1a46a20437d5b326750, type: 3}
+  threshold1: 0.587
+  threshold2: 0.925
+  voidPointProbability: 0.02
+  color1: {r: 1, g: 1, b: 1, a: 1}
+  color2: {r: 1, g: 0, b: 0, a: 1}
+  color3: {r: 1, g: 0.8183497, b: 0, a: 1}
+  color4: {r: 0, g: 0.6942835, b: 1, a: 1}
+  maxRadius: 600
+  minRadius: 200
+  thicknessCircle: 5
 --- !u!4 &1572011059
 Transform:
   m_ObjectHideFlags: 0
@@ -2893,7 +2929,7 @@ Transform:
   m_GameObject: {fileID: 1572011057}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 19.447079, y: 17.616837, z: 3.4995341}
+  m_LocalPosition: {x: 19.447079, y: 17.83, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3245,6 +3281,37 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &1784896361
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1784896362}
+  m_Layer: 0
+  m_Name: PointsConteiner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1784896362
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1784896361}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -177.34767, y: 46.226185, z: -3.5719118}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1794402779
 GameObject:
   m_ObjectHideFlags: 0
@@ -3263,7 +3330,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!50 &1794402780
 Rigidbody2D:
   serializedVersion: 4
@@ -3279,7 +3346,7 @@ Rigidbody2D:
   m_Mass: 2
   m_LinearDrag: 0.5
   m_AngularDrag: 0.5
-  m_GravityScale: 0
+  m_GravityScale: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -3315,7 +3382,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1794402779}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a67c053d15f5cf4981421087f0d670b, type: 3}
   m_Name: 
@@ -3386,11 +3453,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 1
---- !u!1 &1826041906 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8170153791668043269, guid: 0d230cc8be529a542a08cb878ab14b18, type: 3}
-  m_PrefabInstance: {fileID: 717222368}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1826041907 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8170153791668043268, guid: 0d230cc8be529a542a08cb878ab14b18, type: 3}
@@ -3401,29 +3463,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8170153791668043265, guid: 0d230cc8be529a542a08cb878ab14b18, type: 3}
   m_PrefabInstance: {fileID: 717222368}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1826041906}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a47f546fc70ec8428172694e78e4288, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1826041911
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1826041906}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a128979a38c1a3746b2fdffd537f9bc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainCamera: {fileID: 519420031}
-  _timeCd: 0.1
-  _joystick: {fileID: 1826041908}
-  _stick: {fileID: 1152700719}
-  _mushroom: {fileID: 1866531254}
 --- !u!114 &1866531254 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8170153791961219459, guid: 0d230cc8be529a542a08cb878ab14b18, type: 3}
@@ -8788,3 +8833,4 @@ SceneRoots:
   - {fileID: 4849547962908674266}
   - {fileID: 1070694079}
   - {fileID: 1572011059}
+  - {fileID: 1784896362}
