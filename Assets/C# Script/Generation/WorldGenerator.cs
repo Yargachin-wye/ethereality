@@ -1,192 +1,350 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-public class WorldGenerator : MonoBehaviour
+namespace C__Script.Generation
 {
-    [SerializeField] private Color debugColor;
-    [Header("World Generator")]
-    [SerializeField] private Vector2 WorldSize;
-    [SerializeField] private Vector2 WorldCenter;
-    [SerializeField] private float pointsSize = 1;
-    [SerializeField] private Transform pointsConteiner;
-    [Header("Perlin Noize")]
-    [SerializeField] private int numberOfPoints = 100;
-    [SerializeField][Range(0, 1)] private float averageLerp;
-
-    [SerializeField] private Vector2 PositionPerlinOffset1;
-    [SerializeField] private Vector2 PositionPerlinOffset2;
-
-
-    [SerializeField] private float scale = 10f;
-    [SerializeField] private GameObject pointPrefab;
-
-    [SerializeField][Range(0, 1)] private float threshold1;
-    [SerializeField][Range(0, 1)] private float threshold2;
-    [SerializeField][Range(0, 1)] private float voidPointProbability;
-    [SerializeField] private Color color1;
-    [SerializeField] private Color color2;
-    [SerializeField] private Color color3;
-    [Header("Circle")]
-    [SerializeField] private Color color4;
-    [SerializeField] private float maxRadius = 100;
-    [SerializeField] private float minRadius = 100;
-    [SerializeField] private float thicknessCircle;
-
-    private GenerationPoint[] points;
-    private int maxIters = 500000;
-    private void Awake()
+    public class WorldGenerator : MonoBehaviour
     {
-        points = new GenerationPoint[numberOfPoints];
-        for (int i = 0; i < numberOfPoints; i++)
+        [SerializeField] private Color debugColor;
+
+        [Header("World Generator")] [SerializeField]
+        private Vector2Int WorldSize;
+
+        [SerializeField] private Vector2Int WorldCenter;
+        [SerializeField] private float pointsSize = 1;
+        [SerializeField] private Transform pointsConteiner;
+        public Transform PointsConteiner => pointsConteiner;
+
+        [Header("Perlin Noise")] [SerializeField]
+        private int numberOfPoints = 100;
+
+        [SerializeField] [Range(0, 1)] private float averageLerp;
+
+        [SerializeField] private Vector2Int PerlinOffsetMin;
+        [SerializeField] private Vector2Int PerlinOffsetMax;
+
+        [SerializeField] private float scale = 10f;
+        [SerializeField] private GameObject pointPrefab;
+        public GameObject PointPrefab => pointPrefab;
+        [SerializeField] [Range(0, 100)] private int point2Probability;
+        [SerializeField] [Range(0, 1)] private float threshold1;
+        [SerializeField] [Range(0, 1)] private float threshold2;
+        [SerializeField] [Range(0, 100)] private int voidPointProbability;
+
+        [SerializeField] private Color color1;
+        [SerializeField] private Color color2;
+        [SerializeField] private Color color3;
+        [SerializeField] private Color color4;
+        [SerializeField] private Color roundColor5;
+
+        [Header("Circle")] [SerializeField] private float maxRadius = 100;
+        [SerializeField] private float minRadius = 100;
+        [SerializeField] private float thicknessCircle;
+        [SerializeField] private int numCirclePoints = 0;
+        [SerializeField] private int seed = 0;
+
+        public GenerationPointData[] Points { get; private set; }
+
+        private readonly int maxIters = 500000;
+        private readonly System.Random rand = new System.Random();
+
+        public void StartGeneration()
         {
-            GameObject g = Instantiate(pointPrefab); // Создание точки из префаба
-            points[i] = g.GetComponent<GenerationPoint>();
-            points[i].transform.parent = pointsConteiner;
+            Points = new GenerationPointData[numberOfPoints + numCirclePoints];
+            for (int i = 0; i < numberOfPoints + numCirclePoints; i++)
+            {
+                Points[i] = new GenerationPointData();
+                Points[i].Init(this);
+            }
+
+            GenerateWorldPerlinNoize();
+            int iters = 0;
+            while (!GenerateCircle())
+            {
+                iters++;
+                if (iters > 10)
+                {
+                    Debug.Log("Error: Iters > 10");
+                    return;
+                }
+
+                GenerateWorldPerlinNoize();
+            }
         }
-    }
+
+        /*
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            rand = new System.Random(seed);
+
+            GenerateWorldPerlinNoize();
+            int Iters = 0;
+            while (!GenerateCircle())
+            {
+                Iters++;
+                if (Iters > 10)
+                {
+                    Debug.Log("Error: Iters > 10");
+                    return;
+                }
+
+                GenerateWorldPerlinNoize();
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            seed = rand.Next(100000, 999999);
+            rand = new System.Random(seed);
+
             GenerateWorldPerlinNoize();
-            Generate();
-        }
-    }
-    void Generate()
-    {
-        Vector2 center = new Vector2();
-        float radius = -1;
-        int j = 0;
-        while (radius < 0 )
-        {
-            if (j > 10)
+            int Iters = 0;
+            while (!GenerateCircle())
             {
-                Debug.Log("x = " + center.x + "; y = " + center.y + "; r = " + radius);
-                return;
-            }
-            j++;
-            GenereteCircleParams(WorldSize.x / 3, WorldSize.y / 3, minRadius, maxRadius, out center, out radius);
-
-        }
-        Debug.Log("x = " + center.x + "; y = " + center.y + "; r = " + radius);
-
-        int Iters = 0;
-        for (int i = 0; i < numberOfPoints; i++)
-        {
-            Iters++;
-            if (Iters > maxIters)
-            {
-                return;
-            }
-
-            float dist = Vector2.Distance(points[i].transform.position, center);
-            if (dist < radius + thicknessCircle && dist > radius - thicknessCircle)
-            {
-                if (points[i].tipe == 1)
+                Iters++;
+                if (Iters > 10)
                 {
-                    points[i].SetColor(debugColor, -1);
+                    Debug.Log("Error: Iters > 10");
+                    return;
                 }
 
-            }
-            else if (dist < radius - thicknessCircle)
-            {
-                if (points[i].tipe == 2)
-                {
-                    points[i].SetColor(color4, 4);
-                }
+                GenerateWorldPerlinNoize();
             }
         }
     }
-    private void GenereteCircleParams(float centreX, float centreY, float minR, float maxR, out Vector2 CircleCenter, out float CircleRadius)
-    {
-        Vector2 center = new Vector2(
-            Random.Range(-centreX, centreX) + WorldCenter.x,
-            Random.Range(-centreY, centreY) + WorldCenter.y);
-        float radius = maxR;
+    */
 
-        int Iters = 0;
-        for (int i = 0; i < numberOfPoints; i++)
+        private bool GenerateCircle()
         {
-            Iters++;
-            if (Iters > maxIters)
+            Vector2 center = new Vector2();
+            float radius = -1;
+            int j = 0;
+            while (radius < 0)
             {
-                CircleCenter = Vector2.zero;
-                CircleRadius = -1;
-                return;
-            }
-            float dist = Vector2.Distance(points[i].transform.position, center);
-            if (dist < radius + thicknessCircle && dist > radius - thicknessCircle)
-            {
-                if (points[i].tipe == 1)
+                if (j > 10)
                 {
-                    radius -= 5;
-                    if (radius <  minR)
+                    Debug.Log("x = " + center.x + "; y = " + center.y + "; r = " + radius);
+                    return false;
+                }
+
+                j++;
+                GenereteCircleParams(WorldSize.x / 3, WorldSize.y / 3, minRadius, maxRadius, out center, out radius);
+            }
+
+            Debug.Log("x = " + center.x + "; y = " + center.y + "; r = " + radius);
+
+            int Iters = 0;
+            for (int i = 0; i < numberOfPoints; i++)
+            {
+                Iters++;
+                if (Iters > maxIters)
+                {
+                    return false;
+                }
+
+                float dist = Vector2.Distance(Points[i].Position, center);
+                if (dist < radius + thicknessCircle && dist > radius - thicknessCircle)
+                {
+                    if (Points[i].Tipe == BotsList.Bee)
                     {
-                        center = new Vector2(
-                            Random.Range(-centreX, centreX) + WorldCenter.x,
-                            Random.Range(-centreY, centreY) + WorldCenter.y);
-                        radius = maxR;
+                        Points[i].SetColor(debugColor);
+                        Points[i].SetTipe(BotsList.Null);
                     }
-                    i = 0;
+                }
+                else if (dist < radius - thicknessCircle)
+                {
+                    if (Points[i].Tipe == BotsList.Circle)
+                    {
+                        Points[i].SetColor(color4);
+                        Points[i].SetTipe(BotsList.Pill);
+                    }
                 }
             }
+
+            return true;
         }
-        CircleCenter = center;
-        CircleRadius = radius;
 
-    }
-    void GenerateWorldPerlinNoize()
-    {
-        int Iters = 0;
-        for (int i = 0; i < numberOfPoints; i++)
+        private void GenereteCircleParams(float centreX, float centreY, float minR, float maxR,
+            out Vector2 CircleCenter,
+            out float CircleRadius)
         {
-            Iters++;
-            if (Iters > maxIters)
+            Vector2 center = new Vector2(
+                rand.Next((int)-centreX, (int)centreX) + WorldCenter.x,
+                rand.Next((int)-centreY, (int)centreY) + WorldCenter.y);
+            float radius = maxR;
+
+            int Iters = 0;
+            for (int i = 0; i < numberOfPoints; i++)
             {
-                return;
-            }
-
-            float x = Random.Range(WorldCenter.x - WorldSize.y / 2, WorldCenter.x + WorldSize.y / 2); // Случайное значение для x
-            float y = Random.Range(WorldCenter.y - WorldSize.x / 2, WorldCenter.y + WorldSize.x / 2); // Случайное значение для y
-
-            float perlin1 = Mathf.PerlinNoise(x / scale + PositionPerlinOffset1.x, y / scale + PositionPerlinOffset1.y);
-            float perlin2 = Mathf.PerlinNoise(x / scale + PositionPerlinOffset2.x, y / scale + PositionPerlinOffset2.y);
-
-            float perlinAverage = (perlin1 + perlin2) / 2;
-
-            float perlinNoiseVal = Mathf.Lerp(perlin1, perlinAverage, averageLerp);
-
-            Vector3 position = new Vector3(y, x, 0); // Позиция точки с учетом значения шума
-
-            points[i].SetPosition(position); // Создание точки из префаба
-            points[i].SetSize(pointsSize);
-
-            // Рассчитываем расстояние от текущей точки до центра круга
-
-            if (perlinNoiseVal > threshold1 / threshold2)
-            {
-                points[i].gameObject.SetActive(true);
-                points[i].SetColor(color2, 2);
-            }
-            else if (perlinNoiseVal > threshold1)
-            {
-                points[i].gameObject.SetActive(true);
-                points[i].SetColor(color1, 1);
-            }
-            else
-            {
-                if (Random.Range(0f, 1f) < voidPointProbability) // Новая проверка для случайного пятна синего цвета
+                Iters++;
+                if (Iters > maxIters)
                 {
-                    points[i].gameObject.SetActive(true);
-                    points[i].SetColor(color3, 3);
+                    CircleCenter = Vector2.zero;
+                    CircleRadius = -1;
+                    return;
+                }
+
+                float dist = Vector2.Distance(Points[i].Position, center);
+                if (dist < radius + thicknessCircle && dist > radius - thicknessCircle)
+                {
+                    if (Points[i].Tipe == BotsList.Bee)
+                    {
+                        radius -= 5;
+                        if (radius < minR)
+                        {
+                            center = new Vector2(
+                                rand.Next((int)-centreX, (int)centreX) + WorldCenter.x,
+                                rand.Next((int)-centreY, (int)centreY) + WorldCenter.y);
+                            radius = maxR;
+                        }
+
+                        i = 0;
+                    }
+                }
+            }
+
+            CircleCenter = center;
+            CircleRadius = radius;
+
+            GenerateCircleRound(center, radius, BotsList.Defender1);
+        }
+
+        private void GenerateCircleRound(Vector2 center, float radius, BotsList defenderType)
+        {
+            for (int i = numberOfPoints; i < numberOfPoints + numCirclePoints; i++)
+            {
+                float angle = i * (2 * Mathf.PI / numCirclePoints); // Р’С‹С‡РёСЃР»РµРЅРёРµ СѓРіР»Р°
+                float x = center.x + radius * Mathf.Cos(angle); // Р’С‹С‡РёСЃР»РµРЅРёРµ x РєРѕРѕСЂРґРёРЅР°С‚С‹
+                float y = center.y + radius * Mathf.Sin(angle); // Р’С‹С‡РёСЃР»РµРЅРёРµ y РєРѕРѕСЂРґРёРЅР°С‚С‹
+
+                Points[i].SetPosition(new Vector3(x, y, 0));
+
+                Points[i].SetColor(roundColor5);
+                Points[i].SetTipe(defenderType, center.x, center.y);
+            }
+        }
+
+        void GenerateWorldPerlinNoize()
+        {
+            // <test
+            // Time.timeScale = 0;
+            // test>
+
+            Vector2 perNOffset1 = new Vector2(
+                rand.Next(PerlinOffsetMin.x, PerlinOffsetMax.x),
+                rand.Next(PerlinOffsetMin.y, PerlinOffsetMax.y));
+            Vector2 perNOffset2 = new Vector2(
+                rand.Next(PerlinOffsetMin.x, PerlinOffsetMax.x),
+                rand.Next(PerlinOffsetMin.y, PerlinOffsetMax.y));
+
+            int Iters = 0;
+            for (int i = 0; i < numberOfPoints; i++)
+            {
+                Iters++;
+                if (Iters > maxIters)
+                {
+                    return;
+                }
+
+                float x = rand.Next(WorldCenter.x - WorldSize.y / 2,
+                    WorldCenter.x + WorldSize.y / 2); // РЎР»СѓС‡Р°Р№РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ x
+                float y = rand.Next(WorldCenter.y - WorldSize.x / 2,
+                    WorldCenter.y + WorldSize.x / 2); // РЎР»СѓС‡Р°Р№РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ y
+
+                float perlin1 = Mathf.PerlinNoise(x / scale + perNOffset1.x, y / scale + perNOffset1.y);
+                float perlin2 = Mathf.PerlinNoise(x / scale + perNOffset2.x, y / scale + perNOffset2.y);
+
+                float perlinAverage = (perlin1 + perlin2) / 2;
+
+                float perlinNoiseVal = Mathf.Lerp(perlin1, perlinAverage, averageLerp);
+
+                Vector3 position = new Vector3(y, x, 0); // РџРѕР·РёС†РёСЏ С‚РѕС‡РєРё СЃ СѓС‡РµС‚РѕРј Р·РЅР°С‡РµРЅРёСЏ С€СѓРјР°
+
+                Points[i].SetPosition(position); // РЎРѕР·РґР°РЅРёРµ С‚РѕС‡РєРё РёР· РїСЂРµС„Р°Р±Р°
+                Points[i].SetSize(pointsSize);
+
+                // Р Р°СЃСЃС‡РёС‚С‹РІР°РµРј СЂР°СЃСЃС‚РѕСЏРЅРёРµ РѕС‚ С‚РµРєСѓС‰РµР№ С‚РѕС‡РєРё РґРѕ С†РµРЅС‚СЂР° РєСЂСѓРіР°
+
+                if (perlinNoiseVal > threshold1 / threshold2)
+                {
+                    if (rand.Next(0, 100) < point2Probability)
+                    {
+                        Points[i].SetColor(color2);
+                        Points[i].SetTipe(BotsList.Circle);
+                    }
+                    else
+                    {
+                        i--;
+                    }
+                }
+                else if (perlinNoiseVal > threshold1)
+                {
+                    Points[i].SetColor(color1);
+                    Points[i].SetTipe(BotsList.Bee);
                 }
                 else
                 {
-                    i--; // Уменьшение счетчика, чтобы повторно попытаться установить цвет
+                    if (rand.Next(0, 100) < voidPointProbability)
+                    {
+                        Points[i].SetColor(color3);
+                        Points[i].SetTipe(BotsList.Bee);
+                    }
+                    else
+                    {
+                        i--;
+                    }
                 }
+            }
+        }
+
+        public class GenerationPointData
+        {
+#if UNITY_EDITOR
+            private GenerationPoint debugPoint;
+#endif
+            private BotsList _tipe;
+            private Vector3 _position;
+            private Vector2 _circleCenter;
+            public BotsList Tipe => _tipe;
+            public Vector3 Position => _position;
+            public Vector2 CircleCenter => _circleCenter;
+
+            public void SetTipe(BotsList tipe, float xCircle = 0, float yCircle = 0)
+            {
+                _tipe = tipe;
+                _circleCenter = new Vector2(xCircle, yCircle);
+            }
+
+            public void SetPosition(Vector3 position)
+            {
+                _position = position;
+#if UNITY_EDITOR
+                debugPoint.SetPosition(position);
+#endif
+            }
+
+            public void SetColor(Color color)
+            {
+#if UNITY_EDITOR
+                debugPoint.SetColor(color);
+#endif
+            }
+
+            public void SetSize(float size)
+            {
+#if UNITY_EDITOR
+                debugPoint.SetSize(size);
+#endif
+            }
+
+            public void Init(WorldGenerator generator)
+            {
+#if UNITY_EDITOR
+                GameObject g = Instantiate(generator.PointPrefab); // РЎРѕР·РґР°РЅРёРµ С‚РѕС‡РєРё РёР· РїСЂРµС„Р°Р±Р°
+                debugPoint = g.GetComponent<GenerationPoint>();
+                debugPoint.transform.parent = generator.PointsConteiner;
+#endif
             }
         }
     }

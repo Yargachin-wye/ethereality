@@ -19,7 +19,6 @@ public class Harpoon : MonoBehaviour
     
     [SerializeField] private int _dashDMG = 2;
     private bool timeOut;
-    
     private Rigidbody2D rb2d;
 
     public Vector3 targetDirection;
@@ -27,9 +26,7 @@ public class Harpoon : MonoBehaviour
     public static Harpoon instance;
     public bool timeOutDash = false;
     public bool dashCD = false;
-
     public bool hangUp = false;
-
     public UnityEvent shot;
 
     private void Awake()
@@ -43,7 +40,6 @@ public class Harpoon : MonoBehaviour
         instance = this;
         rb2d = GetComponent<Rigidbody2D>();
     }
-    
     public void ShotToClosestPart(Vector2 vector)
     {
         if (timeOut || timeOutDash)
@@ -86,7 +82,7 @@ public class Harpoon : MonoBehaviour
 
         StartCoroutine(TimeOut());
     }
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         if (hangUp)
         {
@@ -99,6 +95,12 @@ public class Harpoon : MonoBehaviour
             Quaternion targetRotation = Quaternion.Euler(0f, 0f, rotZ - 90);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.fixedDeltaTime);
         }
+    }
+    public void RepulsionFromPos(Vector3 Pos)
+    {
+        Vector3 dir = (transform.position - Pos).normalized;
+        float force = Vector3.Distance(Pos, transform.position);
+        rb2d.AddForce(dir * force * 8);
     }
     public void OpenJaw()
     {
@@ -145,7 +147,7 @@ public class Harpoon : MonoBehaviour
             }
         }
     }
-    IEnumerator DashTimeOut()
+    private IEnumerator DashTimeOut()
     {
         hangUp = false;
         timeOutDash = true;
@@ -168,7 +170,7 @@ public class Harpoon : MonoBehaviour
         }
         timeOutDash = false;
     }
-    IEnumerator TimeOut()
+    private IEnumerator TimeOut()
     {
         timeOut = true;
         yield return new WaitForSeconds(_timeCd);

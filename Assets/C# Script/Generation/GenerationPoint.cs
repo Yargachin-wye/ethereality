@@ -1,15 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GenerationPoint : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer spriteRenderer;
-    public int _tipe;
-    public int tipe => _tipe;
-    public void SetColor(Color color, int i)
+    [SerializeField] float spawnerDistance = 20;
+    public BotsList _tipe;
+    public BotsList tipe => _tipe;
+    public Vector3 position => transform.position;
+    
+    private bool tipeSet = false;
+    
+    public void SetColor(Color color)
     {
-        _tipe = i;
+        tipeSet = true;
         spriteRenderer.color = color;
     }
     public void SetSize(float size)

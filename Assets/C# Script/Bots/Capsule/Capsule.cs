@@ -8,6 +8,7 @@ public class Capsule : MonoBehaviour
     [SerializeField] private Sprite[] _sprites = new Sprite[4];
     [SerializeField] private GameObject _ruinedCapsulePrefab;
     [SerializeField] private ParticleSystem _particles;
+    [SerializeField] private bool invulnerable = false;
     private int strength = 0;
     private SpriteRenderer spriteRenderer;
     public bool isDead = false;
@@ -34,15 +35,18 @@ public class Capsule : MonoBehaviour
 
     public void TakeDamage(float timer, int dmg)
     {
+        _particles.Play();
+        if (invulnerable)
+        {
+            return;
+        }
         if (strength + dmg - 1 < _sprites.Length)
         {
-            GetComponent<SpriteRenderer>().sprite = _sprites[strength + dmg - 1];
+            spriteRenderer.sprite = _sprites[strength + dmg - 1];
             strength += dmg;
-            _particles.Play();
         }
         else
         {
-            _particles.Play();
             StartCoroutine(DestroyCapsule(timer));
         }
     }
@@ -66,5 +70,4 @@ public class Capsule : MonoBehaviour
         yield return new WaitForSeconds(timer);
         Dead();
     }
-
 }

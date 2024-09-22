@@ -3075,6 +3075,90 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: YE_47
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 139
+        width: 21
+        height: 21
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d93a56e039ceadd4f84816fee2f8714d
+      internalID: 616696359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YE_48
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 141
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3fb400451f1ff2343b6520d2a31107f2
+      internalID: -1724287229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YE_50
+      rect:
+        serializedVersion: 2
+        x: 114
+        y: 141
+        width: 9
+        height: 6
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c16c40f0fd578d34e9b01de462187f1a
+      internalID: -747880749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: YE_61
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 146
+        width: 5
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53a9a4617eb31604385c863b3d23604c
+      internalID: -956047894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -3211,8 +3295,11 @@ TextureImporter:
       YE_44: -101469926
       YE_45: -754641339
       YE_46: 1861018172
+      YE_47: 616696359
+      YE_48: -1724287229
       YE_49: 1691979878
       YE_5: 239555696
+      YE_50: -747880749
       YE_51: -328007775
       YE_52: -1466545257
       YE_53: -1275657748
@@ -3224,6 +3311,7 @@ TextureImporter:
       YE_59: 550997975
       YE_6: -743581216
       YE_60: 2128680707
+      YE_61: -956047894
       YE_7: 727265660
       YE_8: 344124921
       YE_9: 1962520646

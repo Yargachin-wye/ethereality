@@ -183,11 +183,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sprites:
   - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   _ruinedCapsulePrefab: {fileID: 0}
-  _particles: {fileID: 0}
+  _particles: {fileID: 1770128928227608569}
+  invulnerable: 0
   isDead: 0
 --- !u!1 &1770128928227608570
 GameObject:

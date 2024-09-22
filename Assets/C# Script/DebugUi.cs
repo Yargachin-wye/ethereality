@@ -15,4 +15,5 @@ public class DebugUi : MonoBehaviour
     {
         _text.text = text;
     }
+
 }

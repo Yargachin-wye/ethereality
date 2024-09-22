@@ -21,6 +21,6 @@ public class ColliderButton : MonoBehaviour
     }
     private void Update()
     {
-        rigidbody2D.position = transform.parent.position;
+        transform.position = transform.parent.position;
     }
 }
